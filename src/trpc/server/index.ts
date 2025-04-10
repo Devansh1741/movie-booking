@@ -27,5 +27,5 @@ export const protectedProcedure = (...roles: Role[]) =>
 
     await authorizeUser(ctx.session.userId, roles)
 
-    return next({ ctx })
+    return next({ ctx: { ...ctx, userId: ctx.session.userId } })
   })
