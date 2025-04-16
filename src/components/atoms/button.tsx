@@ -22,13 +22,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading,
       children,
       asChild = false,
+      type,
       ...props
     },
     ref,
   ) => {
     const Comp = asChild ? Slot : 'button'
+    const resolvedType = asChild ? undefined : type ?? 'button'
     return (
       <Comp
+        type={resolvedType}
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
