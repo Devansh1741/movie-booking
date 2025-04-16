@@ -18,22 +18,14 @@ export type FormTypeCreateMovie = z.infer<typeof schemaCreateMovie>
 export const useFormCreateMovie = () =>
   useForm<FormTypeCreateMovie>({
     resolver: zodResolver(schemaCreateMovie),
-    // defaultValues: {
-    //   director: '',
-    //   duration: 0,
-    //   genre: Genre.ACTION,
-    //   posterUrl: '',
-    //   releaseDate: '',
-    //   title: '',
-    // },
   })
 
-// export const FormProviderCreateMovie = ({
-//   children,
-// }: {
-//   children: ReactNode
-// }) => {
-//   const methods = useFormCreateMovie()
+export const FormProviderCreateMovie = ({
+  children,
+}: {
+  children: ReactNode
+}) => {
+  const methods = useFormCreateMovie()
 
-//   return <FormProvider {...methods}>{children}</FormProvider>
-// }
+  return <FormProvider {...methods}>{children}</FormProvider>
+}
