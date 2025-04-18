@@ -13,6 +13,13 @@ import { revalidatePath } from '@/utils/actions/revalidate'
 import { HtmlSelect } from '../atoms/select'
 import { ProjectionType, SoundSystemType } from '@prisma/client'
 import { Grid } from '../organisms/ScreenUtils'
+import { Map } from '../organisms/Map/Map'
+import { Marker } from '../organisms/Map/MapMarker'
+import { Panel } from '../organisms/Map/Panel'
+import { CenterOfMap, DefaultZoomControls } from '../organisms/Map/ZoomControls'
+import { RectangleHorizontal } from 'lucide-react'
+import { SimpleAccordion } from '../molecules/SimpleAccordian'
+import { SearchPlace } from '../organisms/SearchPlace'
 
 export const CreateCinema = () => {
   const {
@@ -20,25 +27,26 @@ export const CreateCinema = () => {
     handleSubmit,
     reset,
     formState: { errors },
+    setValue,
   } = useFormContext<FormTypeCreateCinema>()
 
   const { mutateAsync: createCinema, isLoading } =
     trpcClient.cinemas.createCinema.useMutation()
-  console.log(errors)
-
+  const formData = useWatch()
+  // console.log('formData', formData)
   const { toast } = useToast()
   const router = useRouter()
   return (
-    <div>
+    <div className="grid grid-cols-2 gap-4">
       <form
         onSubmit={handleSubmit(async (data) => {
-          console.log('data', data)
           const cinema = await createCinema(data)
 
           if (cinema) {
             reset()
             toast({ title: `Cinema ${data.cinemaName} created` })
             revalidatePath('/admin/cinemas')
+            revalidatePath('/manager')
             router.replace('/admin/cinemas')
           }
         })}
@@ -61,6 +69,37 @@ export const CreateCinema = () => {
           Create Cinema
         </Button>
       </form>
+
+      <Map
+        initialViewState={{
+          longitude: 80.2,
+          latitude: 12.9,
+          zoom: 8,
+        }}
+      >
+        <MapMarker />
+
+        <Panel position="left-top">
+          {/* <SearchBox
+            onChange={({ lat, lng }) => {
+              setValue('address.lat', lat, { shouldValidate: true })
+              setValue('address.lng', lng, { shouldValidate: true })
+            }}
+          /> */}
+          <SearchPlace />
+          <DefaultZoomControls>
+            <CenterOfMap
+              onClick={(latLng) => {
+                const lat = parseFloat(latLng.lat.toFixed(6))
+                const lng = parseFloat(latLng.lng.toFixed(6))
+
+                setValue('address.lat', lat, { shouldValidate: true })
+                setValue('address.lng', lng, { shouldValidate: true })
+              }}
+            />
+          </DefaultZoomControls>
+        </Panel>
+      </Map>
     </div>
   )
 }
@@ -83,7 +122,7 @@ const AddScreens = () => {
     <div>
       {fields.map((screen, screenIndex) => {
         return (
-          <div key={screen.id}>
+          <SimpleAccordion title={`Screen ${screenIndex + 1}`} key={screen.id}>
             <div className={`flex justify-end my-2`}>
               <Button
                 type="button"
@@ -173,7 +212,7 @@ const AddScreens = () => {
                 columns={screens?.[screenIndex]?.columns || 0}
               />
             </div>
-          </div>
+          </SimpleAccordion>
         )
       })}
       <div className={`flex justify-end my-2`}>
@@ -197,3 +236,30 @@ const AddScreens = () => {
     </div>
   )
 }
+
+const MapMarker = () => {
+  const { address } = useWatch<FormTypeCreateCinema>()
+  const { setValue } = useFormContext<FormTypeCreateCinema>()
+
+  return (
+    <Marker
+      pitchAlignment="auto"
+      longitude={address?.lng || 0}
+      latitude={address?.lat || 0}
+      draggable
+      onDragEnd={({ lngLat }) => {
+        const { lat, lng } = lngLat
+        setValue('address.lat', lat || 0)
+        setValue('address.lng', lng || 0)
+      }}
+    >
+      <BrandIcon />
+    </Marker>
+  )
+}
+
+export const BrandIcon = () => (
+  <div style={{ perspective: '20px' }}>
+    <RectangleHorizontal style={{ transform: 'rotateX(22deg)' }} />
+  </div>
+)

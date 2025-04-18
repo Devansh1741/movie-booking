@@ -1,4 +1,4 @@
-import { CreateMovie } from '@/components/templates/createMovie'
+import { CreateMovie } from '@/components/templates/CreateMovie'
 
 export default function page() {
   return (

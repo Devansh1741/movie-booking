@@ -39,6 +39,7 @@ model Manager {
     User     User    @relation(fields: [id], references: [id])
     Cinema   Cinema? @relation(fields: [cinemaId], references: [id])
     cinemaId Int?
+    
 }
 
 model Cinema {
