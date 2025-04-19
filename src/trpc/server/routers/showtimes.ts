@@ -4,6 +4,42 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
 export const showtimesRoute = createTRPCRouter({
+  seats: publicProcedure
+    .input(z.object({ showtimeId: z.number() }))
+    .query(async ({ ctx, input: { showtimeId } }) => {
+      const showtime = await ctx.db.showtime.findUnique({
+        where: { id: showtimeId },
+        include: { Screen: { include: { Seats: true } } },
+      })
+
+      const seatWithBookingInfo = await Promise.all(
+        showtime?.Screen.Seats.map(async (seat) => {
+          const booking = await ctx.db.booking.findUnique({
+            where: {
+              uniqueSeatShowtime: {
+                column: seat.column,
+                row: seat.row,
+                screenId: seat.screenId,
+                showtimeId,
+              },
+            },
+          })
+
+          return { ...seat, booked: booking?.id ? true : false }
+        }) || [],
+      )
+
+      // const ticketPrice = await ctx.db.showtime.findUnique({
+      //   where: { id: showtimeId },
+      //   include: { Screen: true },
+      // })
+
+      return {
+        seats: seatWithBookingInfo,
+        price: showtime?.Screen.price,
+      }
+    }),
+
   create: protectedProcedure('admin', 'manager')
     .input(schemaCreateShowtime)
     .mutation(async ({ ctx, input }) => {
@@ -91,6 +127,25 @@ export const showtimesRoute = createTRPCRouter({
 
       // Convert object to the desired array format
       return Object.values(showtimesByDate)
+    }),
+  seatsInfo: publicProcedure
+    .input(z.object({ showtimeId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const { showtimeId } = input
+      const showtime = await ctx.db.showtime.findUnique({
+        where: { id: showtimeId },
+      })
+
+      const [total, booked] = await Promise.all([
+        ctx.db.seat.count({
+          where: { screenId: showtime?.screenId },
+        }),
+        ctx.db.booking.count({
+          where: { showtimeId: showtimeId },
+        }),
+      ])
+
+      return { total, booked }
     }),
 })
 

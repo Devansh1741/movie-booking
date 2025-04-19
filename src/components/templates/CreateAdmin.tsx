@@ -23,7 +23,7 @@ export const CreateAdmin = () => {
     if (error) {
       toast({ title: error.message })
     }
-  }, [error])
+  }, [error, toast])
 
   useEffect(() => {
     if (data) {
@@ -31,7 +31,7 @@ export const CreateAdmin = () => {
       toast({ title: 'Admin Created' })
       revalidatePath('/admin/admins')
     }
-  }, [data])
+  }, [data, toast, reset])
 
   return (
     <form

@@ -67,3 +67,17 @@ export const CurvedScreen = ({ width = 300, height = 10 }) => {
     </svg>
   )
 }
+
+export const SeatNumber = ({
+  row,
+  column,
+}: {
+  row: number
+  column: number
+}) => {
+  return (
+    <div className="inline-flex items-center justify-center px-1 py-1 text-sm font-semibold rounded shadow-lg hover:bg-indigo-600">
+      {`${row}.${column}`}
+    </div>
+  )
+}

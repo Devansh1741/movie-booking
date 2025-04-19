@@ -37,7 +37,7 @@ export default function CreateShowTimes() {
       revalidatePath('/manager/cinemas')
       router.replace('/manager/cinemas')
     }
-  }, [data, toast])
+  }, [data, toast, reset, router])
 
   useEffect(() => {
     if (error) {

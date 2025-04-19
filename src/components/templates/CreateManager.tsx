@@ -24,7 +24,7 @@ export const CreateManager = () => {
     if (error) {
       toast({ title: error.message })
     }
-  }, [error])
+  }, [error, toast])
 
   useEffect(() => {
     if (data) {
@@ -32,7 +32,7 @@ export const CreateManager = () => {
       toast({ title: 'Admin Created' })
       revalidatePath('/admin/admins')
     }
-  }, [data])
+  }, [data, reset, toast])
 
   return (
     <form

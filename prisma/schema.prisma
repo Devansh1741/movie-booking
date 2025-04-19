@@ -37,9 +37,9 @@ model Manager {
     updatedAt DateTime @updatedAt
 
     User     User    @relation(fields: [id], references: [id])
-    Cinema   Cinema? @relation(fields: [cinemaId], references: [id])
-    cinemaId Int?
-    
+    // Cinema   Cinema? @relation(fields: [cinemaId], references: [id])
+    // cinemaId Int?
+    Cinema  Cinema[]
 }
 
 model Cinema {

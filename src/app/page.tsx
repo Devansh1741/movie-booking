@@ -1,6 +1,9 @@
-import { trpcServer } from '@/trpc/clients/server'
+import { SearchCinemas } from '@/components/templates/SearchCinemas'
 
 export default async function Home() {
-  const movies = await trpcServer.movies.movies.query()
-  return <main>Hello World</main>
+  return (
+    <main>
+      <SearchCinemas />
+    </main>
+  )
 }

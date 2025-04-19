@@ -1,4 +1,5 @@
 import { RouterOutputs } from '@/trpc/clients/types'
+import Image from 'next/image'
 export const MovieInfo = ({
   movie,
 }: {
@@ -6,7 +7,7 @@ export const MovieInfo = ({
 }) => {
   return (
     <div>
-      <img
+      <Image
         src={movie.posterUrl || '/film.png'}
         alt="Poster"
         className="aspect-square object-cover rounedd shadow-lg"
