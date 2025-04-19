@@ -16,6 +16,7 @@ import { CloudinaryResult } from '@/utils/types'
 import { useRef, useState } from 'react'
 import { Trash, Trash2 } from 'lucide-react'
 import { FileUpload } from '../atoms/fileUpload'
+import Image from 'next/image'
 
 export interface ICreateMovieProps {}
 
@@ -146,7 +147,7 @@ export const CreateMovie = ({}: ICreateMovieProps) => {
             />
           </div>
           {imageFile && (
-            <img
+            <Image
               src={URL.createObjectURL(imageFile)}
               alt="poster"
               className="w-80 h-auto mt-4"

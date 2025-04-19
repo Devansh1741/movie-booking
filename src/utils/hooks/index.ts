@@ -82,123 +82,120 @@ export const useSearchLocation = () => {
   return { loading, setLoading, searchText, setSearchText, locationInfo }
 }
 
-// export const useKeypress = (keys: string[], action?: Function) => {
-//   useEffect(() => {
-//     const onKeyup = (e: { key: any }) => {
-//       if (keys.includes(e.key) && action) action()
-//     }
-//     window.addEventListener('keyup', onKeyup)
-//     return () => window.removeEventListener('keyup', onKeyup)
-//   }, [action, keys])
-// }
+export const useKeypress = (keys: string[], action?: Function) => {
+  useEffect(() => {
+    const onKeyup = (e: { key: any }) => {
+      if (keys.includes(e.key) && action) action()
+    }
+    window.addEventListener('keyup', onKeyup)
+    return () => window.removeEventListener('keyup', onKeyup)
+  }, [action, keys])
+}
 
-// export const useHandleSearch = () => {
-//   const searchParams = useSearchParams()
-//   const params = new URLSearchParams(searchParams)
-//   const pathname = usePathname()
-//   const router = useRouter()
+export const useHandleSearch = () => {
+  const searchParams = useSearchParams()
+  const params = new URLSearchParams(searchParams.toString())
+  const pathname = usePathname()
+  const router = useRouter()
 
-//   const addParam = (key: string, value: string | number) => {
-//     params.set(key, value.toString())
-//     router.replace(`${pathname}?${params}`)
-//   }
+  const addParam = (key: string, value: string | number) => {
+    params.set(key, value.toString())
+    router.replace(`${pathname}?${params}`)
+  }
 
-//   const deleteParam = (key: string) => {
-//     params.delete(key)
-//     console.log('delete:params', params.toString())
-//   }
+  const deleteParams = (keys: string[]) => {
+    keys.forEach((key) => params.delete(key))
+    console.log('delete:params', params.toString())
+  }
 
-//   const deleteAll = () => {
-//     router.replace('/cinemas')
+  const deleteAll = () => {
+    router.replace('/')
+    console.log('deleteAll:params', params.toString())
+  }
 
-//     console.log('deleteAll:params', params.toString())
-//   }
-
-//   return { params, addParam, deleteParam, deleteAll }
-// }
+  return { params, addParam, deleteParams, deleteAll }
+}
 
 /**
  * Get current cinema
  */
 
-// export function useGetCinema({ cinemaId }: { cinemaId: string | null }) {
-//   const { data, refetch } = trpcClient.cinemas.cinema.useQuery(
-//     { cinemaId: +(cinemaId || '') },
-//     { enabled: false },
-//   )
+export function useGetCinema({ cinemaId }: { cinemaId: string | null }) {
+  const { data, refetch } = trpcClient.cinemas.cinema.useQuery(
+    { id: +(cinemaId || '') },
+    { enabled: false },
+  )
 
-//   useEffect(() => {
-//     if (cinemaId) {
-//       refetch()
-//     }
-//   }, [refetch, cinemaId])
+  useEffect(() => {
+    if (cinemaId) {
+      refetch()
+    }
+  }, [refetch, cinemaId])
 
-//   console.log('data ', data)
+  return { cinema: data }
+}
 
-//   return { cinema: data }
-// }
+type SeatRowcolumn = RouterOutputs['showtimes']['seats']['seats'][0]
 
-// type SeatRowcolumn = RouterOutputs['showtimes']['seats']['seats'][0]
+type State = {
+  selectedSeats: SeatRowcolumn[]
+}
 
-// type State = {
-//   selectedSeats: SeatRowcolumn[]
-// }
+type ToggleAction = {
+  type: 'toggleSeat'
+  payload: SeatRowcolumn
+}
+type ResetAction = {
+  type: 'reset'
+}
+type Action = ToggleAction | ResetAction
 
-// type ToggleAction = {
-//   type: 'toggleSeat'
-//   payload: SeatRowcolumn
-// }
-// type ResetAction = {
-//   type: 'reset'
-// }
-// type Action = ToggleAction | ResetAction
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'toggleSeat': {
+      const existingSelection = state.selectedSeats.find(
+        (selectedSeat) =>
+          action.payload?.column === selectedSeat.column &&
+          action.payload?.row === selectedSeat.row,
+      )
 
-// const reducer = (state: State, action: Action): State => {
-//   switch (action.type) {
-//     case 'toggleSeat': {
-//       const existingSelection = state.selectedSeats.find(
-//         (selectedSeat) =>
-//           action.payload?.column === selectedSeat.column &&
-//           action.payload?.row === selectedSeat.row,
-//       )
+      if (existingSelection) {
+        return {
+          ...state,
+          selectedSeats: state.selectedSeats.filter(
+            (seat) =>
+              !(
+                seat.column === action.payload.column &&
+                seat.row === action.payload.row
+              ),
+          ),
+        }
+      } else {
+        return {
+          ...state,
+          selectedSeats: [...state.selectedSeats, action.payload],
+        }
+      }
+    }
+    case 'reset': {
+      return {
+        ...state,
+        selectedSeats: [],
+      }
+    }
+    default:
+      return state
+  }
+}
 
-//       if (existingSelection) {
-//         return {
-//           ...state,
-//           selectedSeats: state.selectedSeats.filter(
-//             (seat) =>
-//               !(
-//                 seat.column === action.payload.column &&
-//                 seat.row === action.payload.row
-//               ),
-//           ),
-//         }
-//       } else {
-//         return {
-//           ...state,
-//           selectedSeats: [...state.selectedSeats, action.payload],
-//         }
-//       }
-//     }
-//     case 'reset': {
-//       return {
-//         ...state,
-//         selectedSeats: [],
-//       }
-//     }
-//     default:
-//       return state
-//   }
-// }
+export const useSeatSelection = () => {
+  const [state, dispatch] = useReducer(reducer, { selectedSeats: [] })
 
-// export const useSeatSelection = () => {
-//   const [state, dispatch] = useReducer(reducer, { selectedSeats: [] })
-
-//   const toggleSeat = (seat: SeatRowcolumn) => {
-//     dispatch({ type: 'toggleSeat', payload: seat })
-//   }
-//   const resetSeats = () => {
-//     dispatch({ type: 'reset' })
-//   }
-//   return { state, toggleSeat, resetSeats }
-// }
+  const toggleSeat = (seat: SeatRowcolumn) => {
+    dispatch({ type: 'toggleSeat', payload: seat })
+  }
+  const resetSeats = () => {
+    dispatch({ type: 'reset' })
+  }
+  return { state, toggleSeat, resetSeats }
+}
