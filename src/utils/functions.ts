@@ -7,6 +7,32 @@ export const random = <T>(arr: T[]) => {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
+export const cloudinaryUpload = async ({
+  imageFile,
+  preset,
+}: {
+  imageFile: File
+  preset: string
+}) => {
+  const formData = new FormData()
+  formData.append('file', imageFile)
+  formData.append('upload_preset', preset)
+  const uploadRes = await fetch(
+    'https://api.cloudinary.com/v1_1/do5r2uhax/image/upload',
+    {
+      method: 'POST',
+      body: formData,
+    },
+  )
+
+  const uploadData = await uploadRes.json()
+  if (!uploadRes.ok) {
+    return { uploadData, status: false }
+  }
+
+  return { uploadData, status: true }
+}
+
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   if (isToday(date)) {

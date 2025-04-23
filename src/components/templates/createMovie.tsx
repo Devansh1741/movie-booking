@@ -17,6 +17,7 @@ import { useRef, useState } from 'react'
 import { Trash, Trash2 } from 'lucide-react'
 import { FileUpload } from '../atoms/fileUpload'
 import Image from 'next/image'
+import { cloudinaryUpload } from '@/utils/functions'
 
 export interface ICreateMovieProps {}
 
@@ -46,25 +47,19 @@ export const CreateMovie = ({}: ICreateMovieProps) => {
       onSubmit={handleSubmit(async (data) => {
         if (imageFile) {
           setImageUploadLoading(true)
-          const formData = new FormData()
-          formData.append('file', imageFile)
-          formData.append('upload_preset', 'yf_directory_poster')
-          const uploadRes = await fetch(
-            'https://api.cloudinary.com/v1_1/do5r2uhax/image/upload',
-            {
-              method: 'POST',
-              body: formData,
-            },
-          )
+          const { uploadData, status } = await cloudinaryUpload({
+            imageFile,
+            preset: 'yf_directory_poster',
+          })
 
-          const uploadData = await uploadRes.json()
-          if (!uploadRes.ok) {
+          if (!status) {
             toast({ title: `Poster upload failed. Please try again` })
             return
           }
           const posterUrl = uploadData.secure_url
           data.posterUrl = posterUrl
         }
+
         const movie = await createMovie(data)
         setImageUploadLoading(false)
         if (movie) {
@@ -151,6 +146,8 @@ export const CreateMovie = ({}: ICreateMovieProps) => {
               src={URL.createObjectURL(imageFile)}
               alt="poster"
               className="w-80 h-auto mt-4"
+              width={320}
+              height={420}
             />
           )}
         </div>

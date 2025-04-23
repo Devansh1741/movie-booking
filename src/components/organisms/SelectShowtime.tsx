@@ -120,7 +120,7 @@ export const ShowRemainingSeats = ({ showtimeId }: { showtimeId: number }) => {
 
   return (
     <div className="text-xs mt-2">
-      {remainingSeats}/{totalSeats} <Armchair className="inline" w-4 h-4 />
+      {remainingSeats}/{totalSeats} <Armchair className="inline h-5 w-5" />
     </div>
   )
 }

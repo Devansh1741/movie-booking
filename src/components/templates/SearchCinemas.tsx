@@ -190,7 +190,10 @@ export const MovieDialog = () => {
         ) : null}
 
         {screenId && showtimeId ? (
-          <SelectSeats showtimeId={Number(showtimeId)} />
+          <SelectSeats
+            showtimeId={Number(showtimeId)}
+            screenId={Number(screenId)}
+          />
         ) : null}
       </div>
     </SimpleDialog>
