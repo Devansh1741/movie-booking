@@ -48,7 +48,7 @@ export const stripeRoutes = createTRPCRouter({
             },
           },
         })
-
+        console.log('Start making qr code')
         const qrData = {
           userId: ticket.uid,
           ticketId: ticket.id,
@@ -58,13 +58,18 @@ export const stripeRoutes = createTRPCRouter({
           time: format(new Date(ticket.Bookings[0].Showtime.startTime), 'PPp'),
         }
 
+        console.log('qrData:', qrData)
+
         const png = await bwipjs.toBuffer({
           bcid: 'qrcode',
           text: JSON.stringify(qrData),
           textxalign: 'center',
         })
 
+        console.log('Png: ')
+
         const qrCodeRes = await bufferUpload(png, 'QR_Code')
+        console.log('Res: ', qrCodeRes)
 
         if (!qrCodeRes.status) {
           throw new TRPCError({
