@@ -67,7 +67,7 @@ export const ShowScreenShowtimes = ({ screenId }: { screenId: number }) => {
                   alt=""
                   className="rounded-lg"
                   width={300}
-                  height={300}
+                  height={420}
                 />
                 <Title2 className="mt-2">{showtime.Movie.title}</Title2>
               </div>

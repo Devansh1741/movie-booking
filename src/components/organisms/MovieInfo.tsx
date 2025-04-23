@@ -12,7 +12,7 @@ export const MovieInfo = ({
         alt="Poster"
         className="aspect-square object-cover rounedd shadow-lg"
         width={300}
-        height={300}
+        height={420}
       />
 
       <div className="text-lg font-semibold">{movie.title}</div>

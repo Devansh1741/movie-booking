@@ -3,8 +3,18 @@ import { generateSeatComment, groupSeatsByRow } from '@/utils/functions'
 import { CurvedScreen, SeatNumber, Square } from './ScreenUtils'
 import { useSeatSelection } from '@/utils/hooks'
 import { Button } from '../atoms/button'
+import { useAuth } from '@clerk/nextjs'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { v4 as uuidv4 } from 'uuid'
 
-export const SelectSeats = ({ showtimeId }: { showtimeId: number }) => {
+export const SelectSeats = ({
+  showtimeId,
+  screenId,
+}: {
+  showtimeId: number
+  screenId: number
+}) => {
   const { data, isLoading } = trpcClient.showtimes.seats.useQuery({
     showtimeId,
   })
@@ -16,6 +26,17 @@ export const SelectSeats = ({ showtimeId }: { showtimeId: number }) => {
     toggleSeat,
     resetSeats,
   } = useSeatSelection()
+  const router = useRouter()
+
+  const { userId } = useAuth()
+
+  if (!userId) {
+    return (
+      <Link href="/sign-in" className="my-8 inline-block">
+        Sign in to select seats
+      </Link>
+    )
+  }
 
   return (
     <div className="mt-8">
@@ -83,6 +104,24 @@ export const SelectSeats = ({ showtimeId }: { showtimeId: number }) => {
           >
             Reset
           </Button>
+
+          {selectedSeats.length ? (
+            <Button
+              onClick={async () => {
+                const booking = {
+                  session_id: 'sess_' + uuidv4(),
+                  screenId,
+                  seats: JSON.stringify(selectedSeats),
+                  showtimeId,
+                  price: data?.price || 0,
+                  userId,
+                }
+                router.push(`/success?booking=${JSON.stringify(booking)}`)
+              }}
+            >
+              Create Booking
+            </Button>
+          ) : null}
         </div>
       </div>
     </div>

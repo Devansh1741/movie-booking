@@ -16,7 +16,7 @@ export const UserCard = ({ user, children }: IUserCardProps) => {
         src={user.image || '/user.jpeg'}
         alt=""
         width={300}
-        height={300}
+        height={420}
         className="w-16 h-16 rounded-full"
       />
       <div>
